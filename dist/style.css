@@ -1,0 +1,25 @@
+*{
+    background-color: lightblue;
+}
+
+.heading{
+    font-size: 42px;
+    text-align: center;
+    font-weight: 700;
+    color: white
+}
+
+.input,
+.subbutton{
+    text-align: center;
+    margin: 20px;
+    color: white;
+    font-size: 26px;
+}
+
+input,
+select{
+    background-color: white;
+    font-size: 26px;
+    color: chartreuse;
+}
