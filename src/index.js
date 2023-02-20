@@ -21,10 +21,11 @@ const desc = document.getElementById('desc')
 const feels = document.getElementById('feels')
 const humid = document.getElementById('humidity')
 const wind = document.getElementById('wind')
+const icon = document.getElementById('icon')
+const celcius = document.getElementById('celcius')
 
 let lat = 0
 let lon = 0
-
 
 function containsNumbers(str) {
     if(/\d/.test(str)){
@@ -33,6 +34,15 @@ function containsNumbers(str) {
         return `http://api.openweathermap.org/geo/1.0/direct?q=${city.value.replace(" ", "")}&appid=${api}`
     }
   }
+function kToC (k){
+    let ans = k-273.15
+    return ans.toFixed(2)
+}
+
+function kToF (k) {
+    let ans = (k - 273.15) * (9/5) + 32
+    return ans.toFixed(2)
+}
 
 async function getWeather(){
 
@@ -56,12 +66,14 @@ async function getWeather(){
 
     console.log(weatherData)
     local.textContent = `${weatherData.name}, ${weatherData.sys.country}`
-    temp.textContent = `${weatherData.main.temp}` //Default is Kelvin
+    temp.textContent = celcius.checked ? `${kToC(weatherData.main.temp)} C` : `${kToF(weatherData.main.temp)} F` //Default is Kelvin
     desc.textContent = `${weatherData.weather[0].description}`
-    feels.textContent = `Feels Like: ${weatherData.main.feels_like}`
+    feels.textContent = `Feels Like: ${celcius.checked ? `${kToC(weatherData.main.feels_like)} C` : `${kToF(weatherData.main.feels_like)} F`}`
     humid.textContent = `Humidity: ${weatherData.main.humidity}`
     wind.textContent = `Wind: ${weatherData.wind.speed} M/Sec`
+    icon.setAttribute('src', `../img/${weatherData.weather[0].icon}.png`)
 }
+
 
 
 

@@ -17,6 +17,17 @@
                     <label for="city">City / Postcode:</label>
                     <input type="text" id="city" value="London" required>
                 </div>
+                <fieldset id="tempunit">
+                    <legend>Units</legend>
+                    <div class="temp">
+                        <input type="radio" id="celcius" name="tunit" value="C" checked>
+                        <label for="celcius">C</label>
+                    </div>
+                    <div class="temp">
+                        <input type="radio" id="farenheit" name="tunit" value="F">
+                        <label for="celcius">F</label>
+                    </div>
+                </fieldset>
                 <div class="subbutton">
                     <button type="submit" id="submit">Get Weather</button>
                 </div>   
@@ -29,6 +40,7 @@
             <div id="feels"></div>
             <div id="humidity"></div>
             <div id="wind"></div>
+            <img id="icon"></img>
         </div>
     </div>
 </body>
