@@ -36,3 +36,8 @@ select{
     text-align: center;
     border: none;
 }
+
+#statusline {
+    height: 20px;
+    color: red
+}

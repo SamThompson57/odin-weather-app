@@ -23,9 +23,13 @@ const humid = document.getElementById('humidity')
 const wind = document.getElementById('wind')
 const icon = document.getElementById('icon')
 const celcius = document.getElementById('celcius')
+const statusLine = document.getElementById('statusline')
 
 let lat = 0
 let lon = 0
+
+let geoStat = 0
+let weatherStat = 0 
 
 function containsNumbers(str) {
     if(/\d/.test(str)){
@@ -44,35 +48,73 @@ function kToF (k) {
     return ans.toFixed(2)
 }
 
+async function getLocation (){
+    try {
+        const locResponse = await fetch(containsNumbers(city.value), {mode: 'cors'})
+        console.log(`Location Status: ${locResponse.status}`)
+        return locResponse.json();
+        
+    } catch (error) {
+        console.log(`Location Status: ${locResponse.status}`)
+        console.log(`Error in GetLocation: ${error}`)
+    }
+}
+
 async function getWeather(){
 
+    statusLine.textContent = 'Loading...'
+
     city.value = city.value.split(' ').join('-')
-    //Gets the long and lat data from desired location
-    const locResponse = await fetch(containsNumbers(city.value), {mode: 'cors'})
+
+    const locData = await getLocation()
     
-    const locData = await locResponse.json();
-    console.log(locData)
-
-    if(/\d/.test(city.value)){
-        lat = locData.lat
-        lon = locData.lon
-    } else {
-        lat = locData[0].lat
-        lon = locData[0].lon
+    
+    if (locData.length !== 0 && locData.length !== undefined) {
+        if(/\d/.test(city.value)){
+            lat = locData.lat
+            lon = locData.lon
+            } else {
+                lat = locData[0].lat
+                lon = locData[0].lon
+            }
+    }   else{
+        lat = null
+        lon = null
     }
+    console.log(locData.length)
     console.log(`LAT:${lat} LON:${lon}`)
-    const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api}`, {mode: 'cors'})
-    const weatherData = await weatherResponse.json();
+    try {    
+        
+        const weatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api}`, {mode: 'cors'})
+        console.log(`Weather Status: ${weatherResponse.status}`)
+        weatherStat = weatherResponse.status
+        const weatherData = await weatherResponse.json();
 
-    console.log(weatherData)
-    local.textContent = `${weatherData.name}, ${weatherData.sys.country}`
-    temp.textContent = celcius.checked ? `${kToC(weatherData.main.temp)} C` : `${kToF(weatherData.main.temp)} F` //Default is Kelvin
-    desc.textContent = `${weatherData.weather[0].description}`
-    feels.textContent = `Feels Like: ${celcius.checked ? `${kToC(weatherData.main.feels_like)} C` : `${kToF(weatherData.main.feels_like)} F`}`
-    humid.textContent = `Humidity: ${weatherData.main.humidity}`
-    wind.textContent = `Wind: ${weatherData.wind.speed} M/Sec`
-    icon.setAttribute('src', `../img/${weatherData.weather[0].icon}.png`)
-}
+        console.log(weatherData)
+        local.textContent = `${weatherData.name}, ${weatherData.sys.country}`
+        temp.textContent = celcius.checked ? `${kToC(weatherData.main.temp)} C` : `${kToF(weatherData.main.temp)} F` //Default is Kelvin
+        desc.textContent = `${weatherData.weather[0].description}`
+        feels.textContent = `Feels Like: ${celcius.checked ? `${kToC(weatherData.main.feels_like)} C` : `${kToF(weatherData.main.feels_like)} F`}`
+        humid.textContent = `Humidity: ${weatherData.main.humidity}`
+        wind.textContent = `Wind: ${weatherData.wind.speed} M/Sec`
+        icon.setAttribute('src', `../img/${weatherData.weather[0].icon}.png`)
+        
+        statusLine.textContent = ''
+    } catch (error){
+        console.log(`Error in Finding Weather`)
+        switch (weatherStat) {
+            case 400 :
+                statusLine.textContent = `Cannot find weather data for ${city.value}`
+                break;
+            case 401 : 
+                statusLine.textContent = `Cannot get weather data just now. Error: ${weatherStat}`
+                break;
+            default :
+                statusLine.textContent = `There has been an error: ${weatherStat}`
+            }
+    }
+
+    }
 
 
 
